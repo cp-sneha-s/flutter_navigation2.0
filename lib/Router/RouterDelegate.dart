@@ -10,14 +10,8 @@ class MyRouterDelegate extends RouterDelegate<MyConfiguration>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  MyRoute _myRoute;
-  MyRoute get myRoute => _myRoute;
+  MyConfiguration configuration ;
 
-  set myRoute(MyRoute value) {
-    if (_myRoute == value) return;
-    _myRoute = value;
-    notifyListeners();
-  }
 
   int _tab = 0;
   int get tab => _tab;
@@ -32,6 +26,18 @@ class MyRouterDelegate extends RouterDelegate<MyConfiguration>
     notifyListeners();
   }
 
+  MyConfiguration setConfig(int value){
+
+    if (value ==0){configuration=MyConfiguration(MyRoute.home,0);}
+    if (value ==1){configuration=MyConfiguration(MyRoute.search,1);}
+    if (value ==2){configuration=MyConfiguration(MyRoute.like,2);}
+    if (value ==3){configuration=MyConfiguration(MyRoute.setting,3);}
+    notifyListeners();
+  }
+
+  @override
+  MyConfiguration get currentConfiguration => setConfig(tab);
+
   @override
   Future<void> setNewRoutePath(MyConfiguration configuration) async {}
 
@@ -41,21 +47,23 @@ class MyRouterDelegate extends RouterDelegate<MyConfiguration>
       key: navigatorKey,
       pages: <Page<void>>[
         MaterialPage(key: ValueKey('home'), child: HomeScreen()),
-        if (_myRoute == MyRoute.search)
+        if (configuration.myRoute == MyRoute.search)
           MaterialPage(key: ValueKey('search'), child: SearchScreen()),
-        if (_myRoute == MyRoute.like)
+        if (configuration.myRoute == MyRoute.like)
           MaterialPage(key: ValueKey('like'), child: LikeScreen()),
-        if (_myRoute == MyRoute.setting)
+        if (configuration.myRoute == MyRoute.setting)
           MaterialPage(key: ValueKey('setting'), child: SettingScreen()),
       ],
       onPopPage: (route, result) {
-        final bool success = route.didPop(result);
-        if (success) {
-          _myRoute = MyRoute.home;
-          notifyListeners();
+        if(!route.didPop(result)){
+
+       return false;
+
+         }return true;
+
         }
-        return success;
-      },
+
+
     );
   }
 }
